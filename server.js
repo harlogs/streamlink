@@ -15,8 +15,8 @@ app.get('/player', async (req, res) => {
   try {
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-')),
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-'))
       //executablePath: puppeteer.executablePath()
     });
 
