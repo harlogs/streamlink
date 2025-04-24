@@ -1,5 +1,8 @@
 import express from 'express';
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 const app = express();
 app.use(express.static('.')); // serve player.html from root
@@ -11,7 +14,8 @@ app.get('/player', async (req, res) => {
   try {
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--disable-web-security', '--user-data-dir=./tmp'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-'))
     });
     const page = await browser.newPage();
     await page.goto(targetUrl);
