@@ -17,7 +17,7 @@ app.get('/player', async (req, res) => {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-')),
-      //executablePath: './.cache/puppeteer/chrome/linux-135.0.7049.95/chrome-linux64/chrome'
+      executablePath: puppeteer.executablePath()
     });
 
     const page = await browser.newPage();
