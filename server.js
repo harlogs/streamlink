@@ -1,3 +1,4 @@
+
 import express from 'express';
 import puppeteer from 'puppeteer';
 import fs from 'fs';
@@ -5,25 +6,54 @@ import os from 'os';
 import path from 'path';
 
 const app = express();
-app.use(express.static('.')); // serve player.html from root
+app.use(express.static('.')); // serve static files like player.html if needed
 
 app.get('/player', async (req, res) => {
   const targetUrl = req.query.url;
-  if (!targetUrl) return res.status(400).send('Missing video URL');
+  if (!targetUrl) return res.status(400).json({ error: 'Missing video URL' });
+
+  // 🔹 Fast path for direct .mp4 links
+  if (targetUrl.endsWith('.mp4')) {
+    return res.json({ videoUrl: targetUrl });
+  }
 
   try {
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-')),
-      executablePath: './.cache/puppeteer/chrome/linux-135.0.7049.95/chrome-linux64/chrome'
+      //executablePath: './.cache/puppeteer/chrome/linux-135.0.7049.95/chrome-linux64/chrome'
     });
-    const page = await browser.newPage();
-    await page.goto(targetUrl);
 
-    // Wait for Streamtape to load and find video source URL
+    const page = await browser.newPage();
+
+    // 🔒 Block Popper.js, ad scripts, and popup-related URLs
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+      const url = request.url();
+      if (
+        url.includes('popper') ||
+        url.includes('ads') ||
+        url.includes('doubleclick') ||
+        url.includes('googlesyndication') ||
+        (url.endsWith('.js') && url.includes('popup'))
+      ) {
+        console.log(`❌ Blocked: ${url}`);
+        return request.abort();
+      }
+      request.continue();
+    });
+
+    // 🧼 Prevent popup windows
+    await page.evaluateOnNewDocument(() => {
+      window.open = () => null;
+    });
+
+    // 🚀 Load the Streamtape page
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
+
+    // 🕵️‍♂️ Extract the video URL
     await page.waitForSelector('video');
-    await console.log('here');
     const videoUrl = await page.evaluate(() => {
       const video = document.querySelector('video');
       return video?.src;
@@ -31,22 +61,19 @@ app.get('/player', async (req, res) => {
 
     await browser.close();
 
-    // Inject video URL into HTML
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head><title>Player</title></head>
-      <body style="margin:0;background:black">
-        <video src="${videoUrl}" controls autoplay style="width:100%;height:100%;object-fit:contain;border:4px solid black;"></video>
-      </body>
-      </html>
-    `;
-    res.send(html);
+    if (!videoUrl) {
+      return res.status(404).json({ error: 'Video URL not found on the page.' });
+    }
+
+    // ✅ Return the final video URL
+    res.json({ videoUrl });
+
   } catch (err) {
-    res.status(500).send(`Error: ${err.message}`);
+    console.error('Error:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
 app.listen(3000, () => {
-  console.log('Server running at http://localhost:3000');
+  console.log('🚀 Server running at http://localhost:3000');
 });
