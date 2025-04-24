@@ -45,7 +45,7 @@ app.get('/player', async (req, res) => {
     });
 
     // 🚀 Load the Streamtape page
-    await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     await page.waitForFunction(() => {
       const result = document.evaluate('//*[@id="mainvideo"]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
