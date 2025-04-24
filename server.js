@@ -17,7 +17,7 @@ app.get('/player', async (req, res) => {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-')),
-      executablePath: puppeteer.executablePath()
+      //executablePath: puppeteer.executablePath()
     });
 
     const page = await browser.newPage();
