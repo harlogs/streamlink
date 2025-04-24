@@ -4,8 +4,10 @@ import puppeteer from 'puppeteer';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import cors from 'cors'; // 🔥 Enable CORS
 
 const app = express();
+app.use(cors());
 app.use(express.static('.')); // serve static files like player.html if needed
 
 app.get('/player', async (req, res) => {
