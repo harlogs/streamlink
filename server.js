@@ -12,11 +12,6 @@ app.get('/player', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) return res.status(400).json({ error: 'Missing video URL' });
 
-  // 🔹 Fast path for direct .mp4 links
-  if (targetUrl.endsWith('.mp4')) {
-    return res.json({ videoUrl: targetUrl });
-  }
-
   try {
     const browser = await puppeteer.launch({
       headless: true,
@@ -52,13 +47,18 @@ app.get('/player', async (req, res) => {
     // 🚀 Load the Streamtape page
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
 
-    // 🕵️‍♂️ Extract the video URL
-    await page.waitForSelector('video');
-    const videoUrl = await page.evaluate(() => {
-      const video = document.querySelector('video');
-      return video?.src;
+    await page.waitForFunction(() => {
+      const result = document.evaluate('//*[@id="mainvideo"]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      return result.singleNodeValue?.src;
     });
-
+    
+    const videoUrl = await page.evaluate(() => {
+      const xpath = '//*[@id="mainvideo"]';
+      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      const video = result.singleNodeValue;
+      return video ? video.src : null;
+    });
+    
     await browser.close();
 
     if (!videoUrl) {
