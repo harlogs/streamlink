@@ -1,10 +1,10 @@
 
-import express from 'express';
-import puppeteer from 'puppeteer';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import cors from 'cors'; // 🔥 Enable CORS
+const express = require('express');
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const cors = require('cors');
 
 const app = express();
 app.use(cors());
