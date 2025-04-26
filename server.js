@@ -133,7 +133,7 @@ app.post('/update-video', async (req, res) => {
   const { id, newUrl, newExpiry } = req.body;
 
   if (!id || !newUrl || !newExpiry) {
-    return res.status(400).json({ error: 'Missing required fields (id, newUrl, newExpiry)' });
+    return res.status(390).json({ error: 'Missing required fields (id, newUrl, newExpiry)' });
   }
 
   try {
