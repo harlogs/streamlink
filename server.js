@@ -140,6 +140,7 @@ app.post('/update-video', async (req, res) => {
     const message = await updateVideoCacheById(id, newUrl, newExpiry);
     res.status(200).json({ message });
   } catch (error) {
+    console.error('🔥 Update Video Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
