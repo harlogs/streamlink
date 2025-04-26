@@ -1,4 +1,3 @@
-
 const express = require('express');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
@@ -17,9 +16,8 @@ app.get('/player', async (req, res) => {
   try {
     const browser = await puppeteer.launch({
       headless: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-'))
-      //executablePath: puppeteer.executablePath()
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      userDataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'puppeteer-profile-'))
     });
 
     const page = await browser.newPage();
@@ -76,6 +74,8 @@ app.get('/player', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('🚀 Server running at http://localhost:3000');
+// Start the Express server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
 });
