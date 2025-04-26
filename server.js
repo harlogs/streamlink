@@ -6,9 +6,14 @@ const path = require('path');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const { Buffer } = require('buffer');
+const owner = 'harlogs';  // Change this to your GitHub username
+const repo = 'gridmov'; // Change this to your GitHub repository
+const filePath = 'data/video-cache.json'; // Path to the video-cache.json file
+const token = process.env.GH_TOKEN;
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 app.use(express.static('.')); // serve static files like player.html if needed
 
 app.get('/player', async (req, res) => {
@@ -76,14 +81,9 @@ app.get('/player', async (req, res) => {
   }
 });
 
-const owner = 'harlogs';  // Change this to your GitHub username
-const repo = 'streamlink'; // Change this to your GitHub repository
-const filePath = 'static/data/video-cache.json'; // Path to the video-cache.json file
-const token = process.env.GH_TOKEN; // GitHub token stored securely in environment variables
-
 // Function to update the video cache JSON on GitHub
 async function updateVideoCacheById(id, newUrl, newExpiry) {
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=gh-pages`;
 
   // Fetch the current file to retrieve content and SHA
   const res = await fetch(url, {
@@ -119,7 +119,8 @@ async function updateVideoCacheById(id, newUrl, newExpiry) {
     body: JSON.stringify({
       message: `Update video URL for movie ID ${id}`,
       content: updatedContent,
-      sha: fileData.sha
+      sha: fileData.sha,
+      branch: 'gh-pages'
     })
   });
 
