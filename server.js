@@ -4,12 +4,12 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const cors = require('cors');
-const fetch = require('node-fetch');
-const { Buffer } = require('buffer');
-const owner = 'harlogs';  // Change this to your GitHub username
-const repo = 'gridmov'; // Change this to your GitHub repository
-const filePath = 'data/video-cache.json'; // Path to the video-cache.json file
-const token = process.env.GH_TOKEN;
+//const fetch = require('node-fetch');
+// const { Buffer } = require('buffer');
+// const owner = 'harlogs';  // Change this to your GitHub username
+// const repo = 'gridmov'; // Change this to your GitHub repository
+// const filePath = 'data/video-cache.json'; // Path to the video-cache.json file
+// const token = process.env.GH_TOKEN;
 
 const app = express();
 app.use(cors());
@@ -81,6 +81,7 @@ app.get('/player', async (req, res) => {
   }
 });
 
+/*
 // Function to update the video cache JSON on GitHub
 async function updateVideoCacheById(id, newUrl, newExpiry) {
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=gh-pages`;
@@ -145,6 +146,7 @@ app.post('/update-video', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+*/
 
 // Start the Express server
 const port = process.env.PORT || 3000;
