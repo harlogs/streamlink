@@ -1,20 +1,33 @@
 const express = require('express');
+const multer = require('multer');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const cors = require('cors');
-//const fetch = require('node-fetch');
-// const { Buffer } = require('buffer');
-// const owner = 'harlogs';  // Change this to your GitHub username
-// const repo = 'gridmov'; // Change this to your GitHub repository
-// const filePath = 'data/video-cache.json'; // Path to the video-cache.json file
-// const token = process.env.GH_TOKEN;
+const { Buffer } = require('buffer');
+const axios = require('axios');
+const { getAutocompleteSuggestions } = require('./autocomplete');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('.')); // serve static files like player.html if needed
+
+
+const port = process.env.PORT || 3000;
+
+// Multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const owner = 'harlogs';  
+const repo = 'moviesmain';
+const token = process.env.GH_TOKEN;
+const branch = 'main';  
+const imageFolder = 'images';      
+const contentFolder = 'content'; 
 
 app.get('/player', async (req, res) => {
   const targetUrl = req.query.url;
@@ -148,8 +161,158 @@ app.post('/update-video', async (req, res) => {
 });
 */
 
+// Upload to GitHub
+async function uploadFileToGitHub(filePath, contentBuffer, commitMessage) {
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+  let sha = undefined;
+
+  // First GET the file to see if it exists
+  const getRes = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/vnd.github.v3+json'
+    }
+  });
+
+  if (getRes.ok) {
+    const fileData = await getRes.json();
+    sha = fileData.sha;  // get the sha if the file exists
+  } else if (getRes.status !== 404) {
+    // If it's not 404 (not found), throw an error
+    throw new Error(`GitHub Fetch Failed: ${await getRes.text()}`);
+  }
+
+  // Prepare the new content
+  const updatedContent = contentBuffer.toString('base64');
+
+  // Now PUT the new file content
+  const putRes = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/vnd.github.v3+json'
+    },
+    body: JSON.stringify({
+      message: commitMessage,
+      content: updatedContent,
+      branch: branch,
+      ...(sha ? { sha } : {})  // only add `sha` if we have it
+    })
+  });
+
+  if (!putRes.ok) {
+    throw new Error(`GitHub Upload Failed: ${await putRes.text()}`);
+  }
+
+  const data = await putRes.json();
+  return data.content.download_url;
+}
+
+
+function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl }) {
+  return `---
+id: ${id}
+title: "${title}"
+image: "${imageUrl}"
+date: ${date}
+languagecategory: ${language}
+year: ${year}
+categories: ["${category}"]
+---
+
+<iframe src="${videoUrl}" width="100%" height="500px" frameborder="0" allowfullscreen></iframe>
+
+<p class="w-full bg-gray-800 text-gray-300 text-justify py-2 mt-4 mx-4">
+  Tags: ${tags}
+</p>
+`;
+}
+
+// POST endpoint
+app.post('/submit', upload.single('image'), async (req, res) => {
+  console.log("Called");
+  console.log(req.body);
+  try {
+    const { id, title, language, year, categories, link, pass } = req.body;
+    const file = req.file;
+
+    if (!id || !title || !language || !year || !categories || !link || !pass || !file) {
+      const missingFields = [];
+      if (!id) missingFields.push('id');
+      if (!title) missingFields.push('title');
+      if (!language) missingFields.push('language');
+      if (!year) missingFields.push('year');
+      if (!categories) missingFields.push('categories');
+      if (!link) missingFields.push('link');
+      if (!pass) missingFields.push('pass');
+      if (!file) missingFields.push('file');
+    
+      return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` });
+    }
+
+    const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const imageExt = path.extname(file.originalname);
+    const imageName = `${safeTitle}-${Date.now()}${imageExt}`;
+    const imagePath = `${imageFolder}/${imageName}`;
+    const datee = new Date().toISOString();
+    let tags = [];
+    try {
+      const response = await axios.get(`http://localhost:${port}/api/suggest?q=${encodeURIComponent(safeTitle)}`);
+      tags = response.data.suggestions;
+    } catch (error) {
+      console.error('Error calling internal suggest API:', error.message);
+      return [];
+    }
+    
+    const imageUrl = await uploadFileToGitHub(imagePath, file.buffer, `Upload poster for ${title}`);
+
+    const markdownContent = generateMarkdown({
+      id,
+      title,
+      imageUrl,
+      date: datee,
+      language,
+      year,
+      category: categories,
+      tags,
+      videoUrl: link
+    });
+
+    console.log(markdownContent);
+
+    const mdFileName = `${safeTitle}.md`;
+    const mdFilePath = `${contentFolder}/${mdFileName}`;
+
+    await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
+
+    res.status(200).json({ message: `✅ Successfully created post: ${title}` });
+
+  } catch (err) {
+    console.error('🔥 Error submitting movie:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/suggest', async (req, res) => {
+  const query = req.query.q;
+  if (!query) {
+    return res.status(400).json({ error: 'Missing ?q=your+search+query' });
+  }
+
+  try {
+    const suggestions = await getAutocompleteSuggestions(query);
+    res.json({ suggestions });
+  } catch (error) {
+    console.error('Error generating suggestions:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Start the Express server
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
 });
