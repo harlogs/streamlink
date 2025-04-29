@@ -26,7 +26,7 @@ const owner = 'harlogs';
 const repo = 'moviesmain';
 const token = process.env.GH_TOKEN;
 const branch = 'main';  
-const imageFolder = 'images';      
+const imageFolder = 'static/images';      
 const contentFolder = 'content'; 
 
 app.get('/player', async (req, res) => {
@@ -282,15 +282,20 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       videoUrl: link
     });
 
-    console.log(markdownContent);
+    //console.log(markdownContent);
 
     const mdFileName = `${safeTitle}.md`;
     const mdFilePath = `${contentFolder}/${mdFileName}`;
 
-    await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
+    if(pass=="22@Monik@22")
+    {
+      await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
-    res.status(200).json({ message: `✅ Successfully created post: ${title}` });
-
+      res.status(200).json({ message: `✅ Successfully created post: ${title}` });
+    }
+    else{
+      res.status(420).json({ message: `Ganja peeke aye ho kya ?` });
+    }
   } catch (err) {
     console.error('🔥 Error submitting movie:', err);
     res.status(500).json({ error: err.message });
