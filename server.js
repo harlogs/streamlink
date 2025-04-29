@@ -257,7 +257,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const imageExt = path.extname(file.originalname);
     const imageName = `${safeTitle}-${Date.now()}${imageExt}`;
-    const imagePath = `${imageFolder}/${imageName}`;
+    const imagePath = `images/${imageName}`;
     const datee = new Date().toISOString();
     let tags = [];
     try {
