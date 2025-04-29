@@ -257,7 +257,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const imageExt = path.extname(file.originalname);
     const imageName = `${safeTitle}-${Date.now()}${imageExt}`;
-    const imagePath = `${imageFolder}/${imageName}`;
+    const imagePath = `${imagePath}/${imageName}`;
     const datee = new Date().toISOString();
     let tags = [];
     try {
@@ -268,12 +268,14 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       return [];
     }
     
-    const imageUrl = await uploadFileToGitHub(imagePath, file.buffer, `Upload poster for ${title}`);
+    const imageUrl = `images/${imageName}`;
+    
+    await uploadFileToGitHub(imagePath, file.buffer, `Upload poster for ${title}`);
 
     const markdownContent = generateMarkdown({
       id,
       title,
-      imagePath,
+      imageUrl:imageUrl,
       date: datee,
       language,
       year,
