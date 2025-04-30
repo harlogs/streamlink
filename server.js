@@ -224,7 +224,7 @@ year: ${year}
 categories: ["${category}"]
 ---
 
-<iframe src="${videoUrl}" width="100%" height="500px" frameborder="0" allowfullscreen></iframe>
+<iframe src="${videoUrl}" width="100%" height="500px" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
 
 <p class="w-full bg-gray-800 text-gray-300 text-justify py-2 mt-4 mx-4">
   Tags: ${tags}
