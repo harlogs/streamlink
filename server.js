@@ -234,8 +234,8 @@ categories: ["${category}"]
 
 // POST endpoint
 app.post('/submit', upload.single('image'), async (req, res) => {
-  console.log("Called");
-  console.log(req.body);
+  //console.log("Called");
+  //console.log(req.body);
   try {
     const { id, title, language, year, categories, link, pass } = req.body;
     const file = req.file;
