@@ -9,8 +9,11 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "fast-levenshtein": "^3.0.0",
+    "levenshtein-edit-distance": "^3.0.1",
     "multer": "^1.4.5-lts.2",
     "node-fetch": "^3.3.2",
     "playwright": "^1.52.0",

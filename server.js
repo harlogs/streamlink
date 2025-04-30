@@ -8,6 +8,8 @@ const cors = require('cors');
 const { Buffer } = require('buffer');
 const axios = require('axios');
 const { getAutocompleteSuggestions } = require('./autocomplete');
+const { get_desc } = require('./desc');
+const { title } = require('process');
 
 const app = express();
 app.use(cors());
@@ -212,8 +214,7 @@ async function uploadFileToGitHub(filePath, contentBuffer, commitMessage) {
   return data.content.download_url;
 }
 
-
-function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl }) {
+function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc }) {
   return `---
 id: ${id}
 title: "${title}"
@@ -222,7 +223,10 @@ date: ${date}
 language: ${language}
 year: ${year}
 categories: ["${category}"]
+tags: ${tags}
 ---
+
+${desc}
 
 <iframe src="${videoUrl}" width="100%" height="500px" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
 
@@ -272,6 +276,8 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     
     await uploadFileToGitHub(imagePath, file.buffer, `Upload poster for ${title}`);
 
+    const desc = await get_desc(title+" film");
+
     const markdownContent = generateMarkdown({
       id,
       title,
@@ -281,10 +287,12 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       year,
       category: categories,
       tags,
-      videoUrl: link
+      videoUrl: link,
+      desc
     });
 
-    //console.log(markdownContent);
+    // console.log(markdownContent);
+    // res.status(200).json({ message: `✅ Successfully created post: ${title}` });
 
     const mdFileName = `${safeTitle}.md`;
     const mdFilePath = `${contentFolder}/${mdFileName}`;
