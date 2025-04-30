@@ -219,7 +219,7 @@ id: ${id}
 title: "${title}"
 image: "${imageUrl}"
 date: ${date}
-languagecategory: ${language}
+language: ${language}
 year: ${year}
 categories: ["${category}"]
 ---
