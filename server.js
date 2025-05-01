@@ -230,11 +230,14 @@ ${desc}
 
 <br>
 
-<iframe src="${videoUrl}" width="100%" height="500px" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
+<iframe src="${videoUrl}"
+  class="w-full h-[300px] sm:h-[400px] md:h-[500px] rounded shadow" 
+  frameborder="0" 
+  allowfullscreen></iframe>
 
 <br>
 
-<p class="w-full bg-gray-800 text-gray-300 text-justify py-2 mt-4 px-4 overflow-auto break-words">
+<p class="w-full bg-gray-800 text-gray-300 text-left p-4 mt-4">
   Tags: ${other}
 </p>
 `;
