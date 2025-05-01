@@ -72,7 +72,7 @@ async function get_desc(movieTitle) {
          descriptions.push("<p class=\"w-full text-white text-justify py-2 mt-4 px-4 overflow-auto break-words\">"+text+"</p>");
          totalLength += text.length;
      
-         if (totalLength >= 1000) {
+         if (totalLength >= 2000) {
            return false; // Stop when we reach or exceed 500 characters
          }
        }
