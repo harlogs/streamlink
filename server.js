@@ -214,7 +214,7 @@ async function uploadFileToGitHub(filePath, contentBuffer, commitMessage) {
   return data.content.download_url;
 }
 
-function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc }) {
+function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc, other }) {
   return `---
 id: ${id}
 title: "${title}"
@@ -228,10 +228,14 @@ tags: ${tags}
 
 ${desc}
 
+<br>
+
 <iframe src="${videoUrl}" width="100%" height="500px" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
 
-<p class="w-full bg-gray-800 text-gray-300 text-justify py-2 mt-4 mx-4">
-  Tags: ${tags}
+<br>
+
+<p class="w-full bg-gray-800 text-gray-300 text-justify py-2 mt-4 px-4 overflow-auto break-words">
+  Tags: ${other}
 </p>
 `;
 }
@@ -278,7 +282,15 @@ app.post('/submit', upload.single('image'), async (req, res) => {
 
     const desc = await get_desc(title+" film");
 
-    const lines = tags.split(',').map(item => `  - ${item.trim()}`).join('\n');
+    let tagList = [];
+
+    if (Array.isArray(tags)) {
+      tagList = tags;
+    } else if (typeof tags === 'string') {
+      tagList = tags.split(',').map(tag => tag.trim());
+    }
+
+    const lines = tagList.map(tag => `  - ${tag}`).join('\n');
     const output = `\n${lines}`;
 
 
@@ -292,7 +304,8 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       category: categories,
       tags:output,
       videoUrl: link,
-      desc
+      desc,
+      other:tags
     });
 
     console.log(markdownContent);

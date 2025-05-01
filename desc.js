@@ -69,7 +69,7 @@ async function get_desc(movieTitle) {
      paragraphs.each((index, element) => {
        const text = $(element).text().trim();
        if (text.length > 0) {
-         descriptions.push(text);
+         descriptions.push("<p class=\"w-full text-white text-justify py-2 mt-4 px-4 overflow-auto break-words\">"+text+"</p>");
          totalLength += text.length;
      
          if (totalLength >= 1000) {
