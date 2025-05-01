@@ -291,7 +291,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       desc
     });
 
-    // console.log(markdownContent);
+    console.log(markdownContent);
     // res.status(200).json({ message: `✅ Successfully created post: ${title}` });
 
     const mdFileName = `${safeTitle}.md`;
