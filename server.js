@@ -278,6 +278,10 @@ app.post('/submit', upload.single('image'), async (req, res) => {
 
     const desc = await get_desc(title+" film");
 
+    const lines = tags.split(',').map(item => `  - ${item.trim()}`).join('\n');
+    const output = `\n${lines}`;
+
+
     const markdownContent = generateMarkdown({
       id,
       title,
@@ -286,7 +290,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       language,
       year,
       category: categories,
-      tags,
+      tags:output,
       videoUrl: link,
       desc
     });
