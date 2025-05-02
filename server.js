@@ -220,7 +220,7 @@ id: ${id}
 title: "${title}"
 image: "${imageUrl}"
 date: ${date}
-language: ${language}
+language: "${language}"
 year: ${year}
 categories: ["${category}"]
 tags: ${tags}
