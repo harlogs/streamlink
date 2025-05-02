@@ -213,8 +213,9 @@ async function uploadFileToGitHub(filePath, contentBuffer, commitMessage) {
   const data = await putRes.json();
   return data.content.download_url;
 }
+const alt = title.replace(/[^a-zA-Z0-9 ]/g, '');
 
-function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc, other }) {
+function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc, other, alt }) {
   return `---
 id: ${id}
 title: "${title}"
@@ -224,6 +225,7 @@ language: "${language}"
 year: ${year}
 categories: ["${category}"]
 tags: ${tags}
+alt: ${alt}
 ---
 
 ${desc}
