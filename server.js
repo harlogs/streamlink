@@ -224,7 +224,7 @@ language: "${language}"
 year: ${year}
 categories: ["${category}"]
 tags: ${tags}
-alt: ${alt}
+alt: "${alt}"
 ---
 
 ${desc}
