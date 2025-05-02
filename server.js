@@ -213,7 +213,6 @@ async function uploadFileToGitHub(filePath, contentBuffer, commitMessage) {
   const data = await putRes.json();
   return data.content.download_url;
 }
-const alt = title.replace(/[^a-zA-Z0-9 ]/g, '');
 
 function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc, other, alt }) {
   return `---
@@ -298,6 +297,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     const lines = tagList.map(tag => `  - ${tag}`).join('\n');
     const output = `\n${lines}`;
 
+    const alt = title.replace(/[^a-zA-Z0-9 ]/g, '');
 
     const markdownContent = generateMarkdown({
       id,
@@ -310,7 +310,8 @@ app.post('/submit', upload.single('image'), async (req, res) => {
       tags:output,
       videoUrl: link,
       desc,
-      other:tags
+      other:tags,
+      alt
     });
 
     console.log(markdownContent);
