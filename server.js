@@ -10,6 +10,8 @@ const axios = require('axios');
 const { getAutocompleteSuggestions } = require('./autocomplete');
 const { get_desc } = require('./desc');
 const { title } = require('process');
+const { handleUploadVideo } = require('./fb_v2.js');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
@@ -27,6 +29,7 @@ const upload = multer({ storage: storage });
 const owner = 'harlogs';  
 const repo = 'moviesmain';
 const token = process.env.GH_TOKEN;
+console.log(token);
 const branch = 'main';  
 const imageFolder = 'static/images';      
 const contentFolder = 'content'; 
@@ -245,14 +248,16 @@ ${desc}
 }
 
 // POST endpoint
-app.post('/submit', upload.single('image'), async (req, res) => {
+app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async (req, res) => {
   //console.log("Called");
   //console.log(req.body);
+  const imageFile = req.files['image']?.[0];
+  const videoFile = req.files['video']?.[0];
   try {
     const { id, title, language, year, categories, link, pass } = req.body;
-    const file = req.file;
+    //const file = req.file;
 
-    if (!id || !title || !language || !year || !categories || !link || !pass || !file) {
+    if (!id || !title || !language || !year || !categories || !link || !pass || !imageFile) {
       const missingFields = [];
       if (!id) missingFields.push('id');
       if (!title) missingFields.push('title');
@@ -267,7 +272,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     }
 
     const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const imageExt = path.extname(file.originalname);
+    const imageExt = path.extname(imageFile.originalname);
     const imageName = `${safeTitle}-${Date.now()}${imageExt}`;
     const imagePath = `${imageFolder}/${imageName}`;
     const datee = new Date().toISOString();
@@ -282,7 +287,7 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     
     const imageUrl = `images/${imageName}`;
     
-    await uploadFileToGitHub(imagePath, file.buffer, `Upload poster for ${title}`);
+    await uploadFileToGitHub(imagePath, imageFile.buffer, `Upload poster for ${title}`);
 
     const desc = await get_desc(title+" film");
 
@@ -320,9 +325,11 @@ app.post('/submit', upload.single('image'), async (req, res) => {
     const mdFileName = `${safeTitle}.md`;
     const mdFilePath = `${contentFolder}/${mdFileName}`;
 
-    if(pass=="22@Monik@22")
+    if(pass=="22@Jacob@22")
     {
       await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
+
+      const result = await handleUploadVideo(imageFile, videoFile, req.body);
 
       res.status(200).json({ message: `✅ Successfully created post: ${title}` });
     }
