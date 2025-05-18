@@ -26,6 +26,7 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "socks-proxy-agent": "^7.0.0",
-    "tmp": "^0.2.3"
+    "tmp": "^0.2.3",
+    "ws": "^8.13.0"
   }
 }
