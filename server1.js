@@ -13,110 +13,26 @@ const { title } = require('process');
 const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
 
-const WebSocket = require('ws');
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('.')); // serve static files like player.html if needed
 
+
 const port = process.env.PORT || 3000;
 
-// === Your existing multer setup ===
+// Multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// === Your existing GitHub repo setup ===
-const owner = 'harlogs';
+const owner = 'harlogs';  
 const repo = 'moviesmain';
 const token = process.env.GH_TOKEN;
-const branch = 'main';
-const imageFolder = 'static/images';
-const contentFolder = 'content';
-
-// === Variables to hold live monitoring data ===
-let callLogs = [];          // store last N call logs
-let notifications = [];     // store last N notifications
-let micStatus = 'stopped';  // mic live stream status
-
-// === Set up HTTP server and WebSocket server ===
-const server = require('http').createServer(app);
-const wss = new WebSocket.Server({ server });
-
-// Broadcast helper to send to all connected clients
-function broadcast(data) {
-  const jsonData = JSON.stringify(data);
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(jsonData);
-    }
-  });
-}
-
-wss.on('connection', ws => {
-  console.log('WebSocket client connected');
-
-  // Send current state on new connection
-  ws.send(JSON.stringify({ type: 'init', micStatus, callLogs, notifications }));
-
-  ws.on('message', message => {
-    try {
-      const data = JSON.parse(message);
-
-      switch (data.type) {
-        case 'notification':
-          // Expect data.payload = { title, text, packageName, timestamp }
-          notifications.unshift(data.payload);
-          if (notifications.length > 50) notifications.pop();
-          broadcast({ type: 'notification', payload: data.payload });
-          break;
-
-        case 'calllog':
-          // Expect data.payload = { number, name, type, date, duration }
-          callLogs.unshift(data.payload);
-          if (callLogs.length > 50) callLogs.pop();
-          broadcast({ type: 'calllog', payload: data.payload });
-          break;
-
-        case 'micStatus':
-          // Expect data.payload = 'started' or 'stopped'
-          micStatus = data.payload;
-          broadcast({ type: 'micStatus', payload: micStatus });
-          break;
-
-        default:
-          console.warn('Unknown message type:', data.type);
-      }
-    } catch (err) {
-      console.error('Error processing WS message:', err);
-    }
-  });
-
-  ws.on('close', () => {
-    console.log('WebSocket client disconnected');
-  });
-});
-
-// === REST API endpoints to query monitoring data ===
-
-// Get last N call logs
-app.get('/api/calllogs', (req, res) => {
-  res.json({ callLogs });
-});
-
-// Get last N notifications
-app.get('/api/notifications', (req, res) => {
-  res.json({ notifications });
-});
-
-// Get mic stream status
-app.get('/api/mic-status', (req, res) => {
-  res.json({ micStatus });
-});
-
-/* === Your existing routes below === */
-
+console.log(token);
+const branch = 'main';  
+const imageFolder = 'static/images';      
+const contentFolder = 'content'; 
 
 app.get('/player', async (req, res) => {
   const targetUrl = req.query.url;
@@ -441,10 +357,7 @@ app.get('/api/suggest', async (req, res) => {
   }
 });
 
-
-// Other existing routes...
-
-// Start the server (replace your current app.listen)
-server.listen(port, () => {
+// Start the Express server
+app.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
 });
