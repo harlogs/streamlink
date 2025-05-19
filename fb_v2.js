@@ -193,6 +193,8 @@ function processVideoToBuffer(videoPath, imagePath, title) {
         '-map [final]',
         '-map 0:a?',
         '-c:v libx264',
+        '-preset veryfast',               // 🔥 add this
+        '-crf 28',  
         '-c:a copy',
         '-movflags +frag_keyframe+empty_moov'
       ])
