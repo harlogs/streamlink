@@ -7,8 +7,8 @@ const path = require('path');
 const cors = require('cors');
 const { Buffer } = require('buffer');
 const axios = require('axios');
-const { getAutocompleteSuggestions } = require('./autocomplete');
-const { get_desc } = require('./desc');
+const { getAutocompleteSuggestions } = require('./autocomplete.js');
+const { get_desc } = require('./desc.js');
 const { title } = require('process');
 const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
@@ -319,7 +319,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
       alt
     });
 
-    console.log(markdownContent);
+    //console.log(markdownContent);
     // res.status(200).json({ message: `✅ Successfully created post: ${title}` });
 
     const mdFileName = `${safeTitle}.md`;
