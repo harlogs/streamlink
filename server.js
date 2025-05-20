@@ -325,7 +325,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     const mdFileName = `${safeTitle}.md`;
     const mdFilePath = `${contentFolder}/${mdFileName}`;
 
-    if(pass=="22@Jacob@22")
+    if(pass=="2222")
     {
       await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
