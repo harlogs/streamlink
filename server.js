@@ -10,7 +10,7 @@ const axios = require('axios');
 const { getAutocompleteSuggestions } = require('./autocomplete.js');
 const { get_desc } = require('./desc.js');
 const { title } = require('process');
-const { handleUploadVideo } = require('./fb_v2.js');
+//const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
 
 const app = express();
