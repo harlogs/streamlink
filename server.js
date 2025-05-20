@@ -329,8 +329,9 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     {
       await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
-      const result = await handleUploadVideo(imageFile, videoFile, req.body);
+      //const result = await handleUploadVideo(imageFile, videoFile, req.body);
 
+      console.log("UPLOADED !");
       res.status(200).json({ message: `✅ Successfully created post: ${title}` });
     }
     else{

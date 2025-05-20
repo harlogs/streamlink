@@ -82,8 +82,8 @@ async function get_desc(movieTitle) {
      const fullDescription = descriptions.join('\n\n');
      
      if (fullDescription) {
-       console.log(`\nDescription for "${movieTitle}":`);
-       console.log(fullDescription);
+       //console.log(`\nDescription for "${movieTitle}":`);
+       //console.log(fullDescription);
      } else {
        console.log("No description found.");
      }
