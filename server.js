@@ -320,7 +320,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     });
 
     //console.log(markdownContent);
-    // res.status(200).json({ message: `✅ Successfully created post: ${title}` });
+    // res.status(200).json({ message: `✅ Successfully created post: ${title}` }); ok
 
     const mdFileName = `${safeTitle}.md`;
     const mdFilePath = `${contentFolder}/${mdFileName}`;
