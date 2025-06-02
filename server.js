@@ -10,7 +10,7 @@ const axios = require('axios');
 const { getAutocompleteSuggestions } = require('./autocomplete.js');
 const { get_desc } = require('./desc.js');
 const { title } = require('process');
-//const { handleUploadVideo } = require('./fb_v2.js');
+const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
 
 const app = express();
@@ -329,7 +329,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     {
       await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
-      //const result = await handleUploadVideo(imageFile, videoFile, req.body);
+      const result = await handleUploadVideo(imageFile, videoFile, req.body);
 
       console.log("UPLOADED !");
       res.status(200).json({ message: `✅ Successfully created post: ${title}` });
