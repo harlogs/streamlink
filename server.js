@@ -278,7 +278,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     const datee = new Date().toISOString();
     let tags = [];
     try {
-      const response = await axios.get(`https://streamlink-production-f6c9.up.railway.app/api/suggest?q=${encodeURIComponent(safeTitle)}`);
+      const response = await axios.get(`https://streamlink-qye0.onrender.com/api/suggest?q=${encodeURIComponent(safeTitle)}`);
       tags = response.data.suggestions;
     } catch (error) {
       console.error('Error calling internal suggest API:', error.message);
