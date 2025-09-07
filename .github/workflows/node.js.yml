@@ -28,13 +28,12 @@ jobs:
 
       - name: Install dependencies
         run: npm run start &
-        
+
       - name: Install localtunnel
         run: npm install -g localtunnel
 
       - name: Start localtunnel
-        run: |
-          lt --port 3000 --print-requests > lt.log &
+        run: npx localtunnel --port 3000 --subdomain=jackdaniels02 &
           sleep 5
           cat lt.log
 
