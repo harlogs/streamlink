@@ -1,7 +1,7 @@
 {
   "name": "createvideolinkstreamtape",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "postinstall": "PUPPETEER_CACHE_DIR=./.cache/puppeteer npx puppeteer browsers install chrome",
     "start": "PUPPETEER_CACHE_DIR=./.cache/puppeteer node server.js",
