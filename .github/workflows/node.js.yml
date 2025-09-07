@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get Public IP Address
+        run: curl https://api.ipify.org
+        
       - name: Checkout repository
         uses: actions/checkout@v3
 
