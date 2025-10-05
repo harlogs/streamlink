@@ -254,7 +254,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
   const imageFile = req.files['image']?.[0];
   const videoFile = req.files['video']?.[0];
   try {
-    const { id, title, language, year, categories, link, pass } = req.body;
+    const { id, title, language, year, categories, link, pass, series, season, episode } = req.body;
     //const file = req.file;
 
     if (!id || !title || !language || !year || !categories || !link || !pass || !imageFile) {
@@ -312,6 +312,9 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
       language,
       year,
       category: categories,
+      series,
+      season,
+      episode,
       tags:output,
       videoUrl: link,
       desc,

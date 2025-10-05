@@ -27,15 +27,7 @@ jobs:
         run: npm run postinstall
 
       - name: Install dependencies
-        run: npm run start &
-
-      - name: Install localtunnel
-        run: npm install -g localtunnel
-
-      - name: Start localtunnel
-        run: npx localtunnel --port 3000 --subdomain=jackdaniels02 &
-          sleep 5
-          cat lt.log
+        run: npm run start
 
       # - name: Run index.js
       #   run: node index.js
