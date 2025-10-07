@@ -217,7 +217,7 @@ async function uploadFileToGitHub(filePath, contentBuffer, commitMessage) {
   return data.content.download_url;
 }
 
-function generateMarkdown({ id, title, imageUrl, date, language, year, category, tags, videoUrl, desc, other, alt }) {
+function generateMarkdown({ id, title, imageUrl, date, language, year, series, season, episode, category, tags, videoUrl, desc, other, alt }) {
   return `---
 id: ${id}
 title: "${title}"
