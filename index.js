@@ -225,8 +225,8 @@ image: "${imageUrl}"
 date: ${date}
 language: "${language}"
 year: ${year}
-series: ${series}
-season: ${season}
+series: "${series}"
+season: "${season}"
 episode: ${episode}
 categories: ["${category}"]
 tags: ${tags}
