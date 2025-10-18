@@ -307,6 +307,15 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
 
     const alt = title.replace(/[^a-zA-Z0-9 ]/g, '');
 
+    let slug = alt.toLowerCase();
+
+    slug = alt.trim().replace(/\s+/g, "-").replace(/-+/g, "-");
+
+    // 4. Prepend your domain
+    const url = `https://movies.technologymanias.com/${slug}/`;
+
+    const alt_text = title + " Download for free full HD 720P 1080P Watch now";
+
     const markdownContent = generateMarkdown({
       id,
       title,
@@ -333,9 +342,31 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
 
     if(pass=="2222")
     {
-      await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
+      // await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
       // const result = await handleUploadVideo(imageFile, videoFile, req.body);
+
+      // Call Python to create Pinterest pin
+     // Create a FormData instance
+      const form = new FormData();
+      form.append('title', title);
+      form.append('description', desc);
+      form.append('alt_text', alt_text);
+      form.append('link', url);
+
+      // Append the file directly from memory
+      form.append('image', imageFile.buffer, {
+        filename: imageFile.originalname,
+        contentType: imageFile.mimetype,
+      });
+
+      // Send POST request to Flask
+      await axios.post('http://localhost:5001/pin', form, {
+        headers: {
+          ...form.getHeaders()
+        }
+      });
+      res.status(200).json({ message: `✅ Successfully created post: ${title} and triggered Pinterest pin` });
 
       console.log("UPLOADED !");
       res.status(200).json({ message: `✅ Successfully created post: ${title}` });

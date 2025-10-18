@@ -1,4 +1,4 @@
-name: Node js
+name: Node js + Python
 
 on:
   workflow_dispatch: 
@@ -16,18 +16,31 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
       - name: Install Chrome for Puppeteer
         run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango1.0-0 libcairo2
           npx puppeteer browsers install chrome
 
-      - name: Install dependencies
+      - name: Install Node.js dependencies
         run: npm install
-      
-      - name: Install dependencies
+
+      - name: Postinstall scripts
         run: npm run postinstall
 
-      - name: Install dependencies
-        run: npm run start
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      # - name: Run index.js
-      #   run: node index.js
+      - name: Start Python Flask server
+        run: |
+          nohup python3 pinterest_api.py &
+
+      - name: Start Node.js app
+        run: npm run start
