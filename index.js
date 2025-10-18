@@ -12,7 +12,7 @@ const { get_desc } = require('./desc.js');
 const { title } = require('process');
 // const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
-import { spawn } from 'child_process';
+const { spawn } = require('child_process');
 
 const app = express();
 
