@@ -12,8 +12,15 @@ const { get_desc } = require('./desc.js');
 const { title } = require('process');
 // const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
+import { spawn } from 'child_process';
 
 const app = express();
+
+// --- START THE PYTHON SERVER ---
+const python = spawn('python', ['pinterest.py']);
+python.stdout.on('data', data => console.log(`🐍 ${data}`));
+python.stderr.on('data', data => console.error(`🐍 Error: ${data}`));
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

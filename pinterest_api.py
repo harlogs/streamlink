@@ -27,7 +27,7 @@ def pin():
 
     if missing_fields:
         missing_str = ", ".join(missing_fields)
-        return jsonify({"error": f"Missing required fields: {missing_str}"}), 400
+        return jsonify({"error": "Missing required fields", "fields": missing_fields}), 400
 
     import tempfile, os
     try:
@@ -40,6 +40,7 @@ def pin():
         return jsonify({"message": "✅ Pin created successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+        
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    port = int(os.environ.get("FLASK_PORT", 5001))
+    app.run(host="0.0.0.0", port=port)
