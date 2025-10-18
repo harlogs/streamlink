@@ -326,7 +326,7 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
       category: categories,
       series: series,
       season: season,
-      episode: season,
+      episode: episode,
       tags:output,
       videoUrl: link,
       desc,
