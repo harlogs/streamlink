@@ -12,8 +12,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
 
 # ---------- CONFIG ----------
-PINTEREST_EMAIL = os.environ.get("PINTEREST_EMAIL") or "youremail@gmail.com"
-PINTEREST_PASSWORD = os.environ.get("PINTEREST_PASSWORD") or "yourpassword"
+PINTEREST_EMAIL = os.environ.get("PINTEREST_EMAIL") or "meetwill9222@gmail.com"
+PINTEREST_PASSWORD = os.environ.get("PINTEREST_PASSWORD") or "22@Willas@22"
 SESSION_FILE = "pinterest_session.json"
 PIN_CREATOR_URL = "https://www.pinterest.com/pin-builder/"
 
@@ -76,9 +76,12 @@ def smart_login(driver, wait):
 # ---------- CREATE PIN ----------
 def create_pin(title, description, alt_text, link, image_path=None):
     chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--disable-popup-blocking")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     wait = WebDriverWait(driver, 30)

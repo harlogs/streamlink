@@ -11,10 +11,23 @@ def pin():
     description = request.form.get("description")
     alt_text = request.form.get("alt_text")
     link = request.form.get("link")
-    image_file = request.files.get("image")
+    image_file = request.files.get("image_file")
     
-    if not all([title, description, alt_text, link, image_file]):
-        return jsonify({"error": "Missing required fields"}), 400
+    missing_fields = []
+    if not title:
+        missing_fields.append("title")
+    if not description:
+        missing_fields.append("description")
+    if not alt_text:
+        missing_fields.append("alt_text")
+    if not link:
+        missing_fields.append("link")
+    if not image_file:
+        missing_fields.append("image_file")
+
+    if missing_fields:
+        missing_str = ", ".join(missing_fields)
+        return jsonify({"error": f"Missing required fields: {missing_str}"}), 400
 
     import tempfile, os
     try:
