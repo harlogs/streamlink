@@ -39,8 +39,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Start Python Flask server
-        run: |
-          nohup python3 pinterest_api.py &
+        run: python pinterest_api.py
 
       - name: Start Node.js app
         run: npm run start
