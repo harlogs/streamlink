@@ -194,15 +194,32 @@ async function safeGoToPinBuilder(page) {
     await sleep(5000); 
 }
 
-// ---------- TEST ----------
-(async () => {
-    const args = process.argv.slice(2);
-    if (args.length < 4) {
-        console.log("❌ Missing arguments. Usage: node pinterest.js <title> <description> <alt_text> <link> [image_path]");
-        process.exit(1);
-    }
+// // ---------- TEST ----------
+// (async () => {
+//     const args = process.argv.slice(2);
+//     if (args.length < 4) {
+//         console.log("❌ Missing arguments. Usage: node pinterest.js <title> <description> <alt_text> <link> [image_path]");
+//         process.exit(1);
+//     }
 
-    const [title, description, altText, link, imagePath] = args;
-    console.log(`🚀 Creating pin for: ${title}`);
-    await createPin(title, description, altText, link, imagePath);
-})();
+//     const [title, description, altText, link, imagePath] = args;
+//     console.log(`🚀 Creating pin for: ${title}`);
+//     await createPin(title, description, altText, link, imagePath);
+// })();
+// Only run when executed directly, not when imported
+if (require.main === module) {
+    (async () => {
+        const args = process.argv.slice(2);
+        if (args.length < 4) {
+            console.log("❌ Missing arguments. Usage: node pinterest.js <title> <description> <alt_text> <link> [image_path]");
+            process.exit(1);
+        }
+
+        const [title, description, altText, link, imagePath] = args;
+        console.log(`🚀 Creating pin for: ${title}`);
+        await createPin(title, description, altText, link, imagePath);
+    })();
+}
+
+// Export for external use
+module.exports = { createPin };

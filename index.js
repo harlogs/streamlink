@@ -12,7 +12,8 @@ const { get_desc } = require('./desc.js');
 const { title } = require('process');
 // const { handleUploadVideo } = require('./fb_v2.js');
 require('dotenv').config();
-const { spawn } = require('child_process');
+// const { spawn } = require('child_process');
+const { createPin } = require('./pin');
 
 const app = express();
 
@@ -257,6 +258,30 @@ ${desc}
 `;
 }
 
+async function saveTempImage(file) {
+    try {
+        const imageFile = file;
+
+        if (!imageFile) {
+            throw new Error("⚠️ No image file uploaded");
+        }
+
+        // Save to /tmp folder
+        const tempPath = path.join('/tmp', imageFile.originalname);
+
+        // Write file buffer to disk
+        fs.writeFileSync(tempPath, imageFile.buffer);
+
+        console.log(`✅ Image saved to temporary path: ${tempPath}`);
+
+        // Return path for further use
+        return tempPath;
+    } catch (err) {
+        console.error("🔥 Failed to save temp image:", err);
+        throw err;
+    }
+}
+
 // POST endpoint
 app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async (req, res) => {
   console.log("Called");
@@ -353,6 +378,16 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     {
       await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
+      const imgg= await saveTempImage(imageFile);
+
+      if (!imgg) {
+            throw new Error("⚠️ No image file uploaded");
+        }
+
+      await createPin(title, alt_text, alt_text, url, imgg);
+
+      fs.unlinkSync(imgg);
+
       // const result = await handleUploadVideo(imageFile, videoFile, req.body);
 
       // Call Python to create Pinterest pin
@@ -371,33 +406,34 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
       // });
 
       // Send POST request to Flask
-      try{
-        await new Promise((resolve, reject) => {
-          const args = [title, alt_text, alt_text, url, '/tmp/' + imageFile.originalname];
+      // try{
+      //   await new Promise((resolve, reject) => {
+      //     const args = [title, alt_text, alt_text, url, '/tmp/' + imageFile.originalname];
 
-          // Save image temporarily so Python can access it
-          fs.writeFileSync(args[4], imageFile.buffer);
+      //     // Save image temporarily so Python can access it
+      //     fs.writeFileSync(args[4], imageFile.buffer);
 
-          const python = spawn('python', ['-u', 'pinterest.py', ...args]);
-          python.on('error', (err) => {
-            console.error("🐍 Python spawn failed:", err);
-            reject(err);
-          });
+      //     const python = spawn('python', ['-u', 'pinterest.py', ...args]);
+      //     python.on('error', (err) => {
+      //       console.error("🐍 Python spawn failed:", err);
+      //       reject(err);
+      //     });
 
-          python.stdout.on('data', (data) => process.stdout.write(`🐍 ${data}`));
-          python.stderr.on('data', (data) => process.stderr.write(`🐍 Error: ${data}`));
+      //     python.stdout.on('data', (data) => process.stdout.write(`🐍 ${data}`));
+      //     python.stderr.on('data', (data) => process.stderr.write(`🐍 Error: ${data}`));
 
-          python.on('close', (code) => {
-            fs.unlinkSync(args[4]); // delete temp file
-            if (code === 0) resolve();
-            else reject(new Error(`Python exited with code ${code}`));
-          });
-        });
-      }
-      catch(e)
-      {
-        console.error('Error calling internal suggest API:', e);
-      }
+      //     python.on('close', (code) => {
+      //       fs.unlinkSync(args[4]); // delete temp file
+      //       if (code === 0) resolve();
+      //       else reject(new Error(`Python exited with code ${code}`));
+      //     });
+      //   });
+      // }
+      // catch(e)
+      // {
+      //   console.error('Error calling internal suggest API:', e);
+      // }
+
       res.status(200).json({ message: `✅ Successfully created post: ${title} and triggered Pinterest pin` });
 
       console.log("UPLOADED !");
