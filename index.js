@@ -378,15 +378,17 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
     {
       await uploadFileToGitHub(mdFilePath, Buffer.from(markdownContent), `Create movie post: ${title}`);
 
-      const imgg= await saveTempImage(imageFile);
-
-      if (!imgg) {
-            throw new Error("⚠️ No image file uploaded");
-        }
-
-      await createPin(title, alt_text, alt_text, url, imgg);
-
-      fs.unlinkSync(imgg);
+      try{
+        const imgg= await saveTempImage(imageFile);
+        if (!imgg) {
+              throw new Error("⚠️ No image file uploaded");
+          }
+        await createPin(title, alt_text, alt_text, url, imgg);
+      }
+      catch(e)
+      {
+        console.error('🔥 Error pinterest movie:', e);
+      }
 
       // const result = await handleUploadVideo(imageFile, videoFile, req.body);
 

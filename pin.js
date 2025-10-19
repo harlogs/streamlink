@@ -160,6 +160,7 @@ async function createPin(title, description, altText, link, imagePath = null) {
             } catch (e) {
                 console.log("⚠️ Could not click Publish button:", e);
             }
+            fs.unlinkSync(imgg);
         } else {
             console.log("⚠️ Path not found !:", imagePath);
         }
