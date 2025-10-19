@@ -259,7 +259,7 @@ ${desc}
 
 // POST endpoint
 app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async (req, res) => {
-  //console.log("Called");
+  console.log("Called");
   //console.log(req.body);
   const imageFile = req.files['image']?.[0];
   const videoFile = req.files['video']?.[0];
@@ -371,23 +371,33 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
       // });
 
       // Send POST request to Flask
-      await new Promise((resolve, reject) => {
-        const args = [title, alt_text, alt_text, url, '/tmp/' + imageFile.originalname];
+      try{
+        await new Promise((resolve, reject) => {
+          const args = [title, alt_text, alt_text, url, '/tmp/' + imageFile.originalname];
 
-        // Save image temporarily so Python can access it
-        fs.writeFileSync(args[4], imageFile.buffer);
+          // Save image temporarily so Python can access it
+          fs.writeFileSync(args[4], imageFile.buffer);
 
-        const python = spawn('python3', ['pinterest.py', ...args]);
+          const python = spawn('python', ['-u', 'pinterest.py', ...args]);
+          python.on('error', (err) => {
+            console.error("🐍 Python spawn failed:", err);
+            reject(err);
+          });
 
-        python.stdout.on('data', (data) => process.stdout.write(`🐍 ${data}`));
-        python.stderr.on('data', (data) => process.stderr.write(`🐍 Error: ${data}`));
+          python.stdout.on('data', (data) => process.stdout.write(`🐍 ${data}`));
+          python.stderr.on('data', (data) => process.stderr.write(`🐍 Error: ${data}`));
 
-        python.on('close', (code) => {
-          fs.unlinkSync(args[4]); // delete temp file
-          if (code === 0) resolve();
-          else reject(new Error(`Python exited with code ${code}`));
+          python.on('close', (code) => {
+            fs.unlinkSync(args[4]); // delete temp file
+            if (code === 0) resolve();
+            else reject(new Error(`Python exited with code ${code}`));
+          });
         });
-      });
+      }
+      catch(e)
+      {
+        console.error('Error calling internal suggest API:', e);
+      }
       res.status(200).json({ message: `✅ Successfully created post: ${title} and triggered Pinterest pin` });
 
       console.log("UPLOADED !");
