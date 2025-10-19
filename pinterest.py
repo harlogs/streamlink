@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
+import sys
 
 # ---------- CONFIG ----------
 PINTEREST_EMAIL = os.environ.get("PINTEREST_EMAIL") or "meetwill9222@gmail.com"
@@ -216,3 +217,17 @@ def safe_go_to_pin_builder(driver, wait):
 #     image_path = os.path.join(os.getcwd(), "logo.png")
 
 #     create_pin(title, description, alt_text, link, image_path)
+
+if __name__ == "__main__":
+    if len(sys.argv) < 5:
+        print("❌ Missing arguments. Usage: pinterest.py <title> <description> <alt_text> <link> [image_path]")
+        sys.exit(1)
+
+    title = sys.argv[1]
+    description = sys.argv[2]
+    alt_text = sys.argv[3]
+    link = sys.argv[4]
+    image_path = sys.argv[5] if len(sys.argv) > 5 else None
+
+    print(f"🚀 Creating pin for: {title}")
+    create_pin(title, description, alt_text, link, image_path)

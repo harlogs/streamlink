@@ -17,9 +17,9 @@ const { spawn } = require('child_process');
 const app = express();
 
 // --- START THE PYTHON SERVER ---
-const python = spawn('python', ['pinterest.py']);
-python.stdout.on('data', data => console.log(`🐍 ${data}`));
-python.stderr.on('data', data => console.error(`🐍 Error: ${data}`));
+// const python = spawn('python', ['pinterest.py']);
+// python.stdout.on('data', data => console.log(`🐍 ${data}`));
+// python.stderr.on('data', data => console.error(`🐍 Error: ${data}`));
 
 app.use(cors());
 app.use(express.json());
@@ -357,22 +357,36 @@ app.post('/submit', upload.fields([{ name: 'image' }, { name: 'video' }]), async
 
       // Call Python to create Pinterest pin
      // Create a FormData instance
-      const FormData = require('form-data'); 
-      const form = new FormData();
-      form.append('title', title);
-      form.append('description', alt_text);
-      form.append('alt_text', alt_text);
-      form.append('link', url);
+      // const FormData = require('form-data'); 
+      // const form = new FormData();
+      // form.append('title', title);
+      // form.append('description', alt_text);
+      // form.append('alt_text', alt_text);
+      // form.append('link', url);
 
-      // // Append the file directly from memory
-      form.append('image_file', imageFile.buffer, {
-        filename: imageFile.originalname,
-        contentType: imageFile.mimetype
-      });
+      // // // Append the file directly from memory
+      // form.append('image_file', imageFile.buffer, {
+      //   filename: imageFile.originalname,
+      //   contentType: imageFile.mimetype
+      // });
 
       // Send POST request to Flask
-      await axios.post('http://127.0.0.1:5001/pin', form, {
-        // headers: form.getHeaders()
+      await new Promise((resolve, reject) => {
+        const args = [title, alt_text, alt_text, url, '/tmp/' + imageFile.originalname];
+
+        // Save image temporarily so Python can access it
+        fs.writeFileSync(args[4], imageFile.buffer);
+
+        const python = spawn('python3', ['pinterest.py', ...args]);
+
+        python.stdout.on('data', (data) => process.stdout.write(`🐍 ${data}`));
+        python.stderr.on('data', (data) => process.stderr.write(`🐍 Error: ${data}`));
+
+        python.on('close', (code) => {
+          fs.unlinkSync(args[4]); // delete temp file
+          if (code === 0) resolve();
+          else reject(new Error(`Python exited with code ${code}`));
+        });
       });
       res.status(200).json({ message: `✅ Successfully created post: ${title} and triggered Pinterest pin` });
 
