@@ -77,7 +77,7 @@ async function smartLogin(page) {
 // ---------- CREATE PIN ----------
 async function createPin(title, description, altText, link, imagePath = null) {
     const browser = await puppeteer.launch({ 
-        headless: false, 
+        headless: true, 
         args: [
             '--disable-notifications',     // disable notifications
             '--disable-popup-blocking',    // disable popup blocking
