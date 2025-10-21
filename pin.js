@@ -50,9 +50,10 @@ async function smartLogin(page) {
         } else if (idExists) {
             console.log("🪄  Two-step login");
             await page.type('input[name="id"]', PINTEREST_EMAIL, { delay: 100 });
-            const [continueButton] = await page.$x("//button//div[text()='Continue']");
-            if (continueButton) {
-                await continueButton.click();
+            const continueButton = page.locator("//button//div[text()='Continue']");
+            if (await continueButton.count() > 0) {
+                console.log("✅ Found Continue button");
+                await continueButton.first().click();
             } else {
                 console.log("⚠️ Continue button not found");
             }
